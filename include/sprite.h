@@ -11,7 +11,9 @@ typedef struct {
 typedef struct {
     transform_t transform;
 
-    // gl data
+    vec4 color;
+
+    // TODO: These should move into a struct called render_data that will be given to renderer
     u64 vbo;
     u64 ibo;
     u64 vao;
@@ -19,6 +21,8 @@ typedef struct {
 
 sprite_t create_sprite(const char* name, const char* path);
 
-void setup_transform(transform_t* transform);
+void set_position(transform_t* transform, vec3 position);
+void set_scale(transform_t* transform, vec3 scale);
 
+// TODO: This will be moved into renderer
 void draw_sprite(sprite_t* sprite);

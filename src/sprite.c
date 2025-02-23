@@ -3,6 +3,9 @@
 sprite_t create_sprite(const char* name, const char* path) {
     sprite_t sprite;
 
+    glm_vec3_make((vec3){10, 10, 0}, sprite.transform.position);
+    glm_vec3_make((vec3){50, 50, 1}, sprite.transform.scale);
+
     float vertices[] = {
         // vertices
         -0.5f, -0.5f, 0.0f,
@@ -33,7 +36,7 @@ sprite_t create_sprite(const char* name, const char* path) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Bind vao pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     glEnableVertexAttribArray(0);
 
     // unbind the vao
@@ -42,7 +45,12 @@ sprite_t create_sprite(const char* name, const char* path) {
     return sprite;
 }
 
-void setup_transform(transform_t* transform) {
+void set_position(transform_t *transform, vec3 position) {
+    glm_vec3_make((const float*)position, transform->position);
+}
+
+void set_scale(transform_t *transform, vec3 scale) {
+    glm_vec3_make((const float*)scale, transform->scale);
 }
 
 void draw_sprite(sprite_t* sprite) {

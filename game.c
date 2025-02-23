@@ -3,10 +3,12 @@
 #include "resource.h"
 #include "shader.h"
 #include "sprite.h"
+#include "renderer.h"
 
 typedef struct {
     GLFWwindow* win_handle;
     resource_container resources;
+    renderer_t renderer;
 } game_context;
 
 int main() {
@@ -45,18 +47,27 @@ int main() {
         return -1;
     }
 
+    // TODO: Refactoring reminder
+    // Resources should contain all the loaded sprites
+    // get_render_data will return an array of sprite data to renderer
+    // shader compiling and stuff will be moved into renderer
+    ctx.renderer = init_renderer((renderer_data_t) {
+        .w = 800,
+        .h = 600,
+        .near_plane = -1,
+        .far_plane = 1,
+        .program_id = ctx.resources.program_id
+    });
+
+    // TODO: These should be moved into resource loader
     sprite_t sprite = create_sprite("red box", NULL);
+    set_position(&sprite.transform, (vec3) { 100, 300, 0 });
 
-    mat4 projection;
-    glm_ortho(0, 800, 600, 0, -1, 1, projection);
+    sprite_t sprite_2 = create_sprite("blue box", NULL);
+    set_position(&sprite_2.transform, (vec3) { 100, 100, 0 });
 
-    mat4 model;
-    glm_mat4_identity(model);
-    glm_translate(model, (vec3){500, 400, 0.0});
-    glm_scale(model, (vec3){50.0, 50.0, 1.0});
-
-    set_shader_param_mat4(ctx.resources.program_id, "projection", projection);
-    set_shader_param_mat4(ctx.resources.program_id, "model", model);
+    // set the game context to main window context's user data
+    glfwSetWindowUserPointer(window, &ctx);
 
     // update loop
     while (!glfwWindowShouldClose(window)) {
@@ -66,8 +77,12 @@ int main() {
         float red = sin(glfwGetTime());
 
         use_program(ctx.resources.program_id);
+
+        renderer_update(&ctx.renderer, &sprite);
+        renderer_update(&ctx.renderer, &sprite_2);
+
+        // color test
         set_shader_param_vec4(ctx.resources.program_id, "u_Color", (vec4){ red, 1.0, 0.0, 1.0 });
-        draw_sprite(&sprite);
 
         glfwPollEvents();
         glfwSwapBuffers(window);
