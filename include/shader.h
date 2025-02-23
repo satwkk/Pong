@@ -38,13 +38,7 @@ typedef struct {
 
 int load_shader(char* shaderSrc, int shader_type, shader_t* out_shader);
 
-char* read_file_contents(const char*);
-
-u64 create_program(
-    shader_t* vertex, 
-    shader_t* fragment
-    /** Add more here */
-);
+u64 create_program( shader_t* vertex, shader_t* fragment);
 
 void use_program(u64 program);
 

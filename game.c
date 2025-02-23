@@ -12,36 +12,40 @@ typedef struct {
 } game_context;
 
 int main() {
+    // Initialize GLFW
     int glfw_err = glfwInit();
     if (glfw_err < 0) {
         fprintf(stderr, "GLFW initialization failed: %s\n", glewGetErrorString(glfw_err));
         return -1;
     }
 
+    // Setup GLFW config
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    // Create window
     GLFWwindow* window = glfwCreateWindow(800, 600, "Hello world", NULL, NULL);
     if (!window) {
         fprintf(stderr, "window initialization failed\n");
         return -1;
     }
 
+    // Create the window context
     glfwMakeContextCurrent(window);
 
+    // Initialize GLEW
+    // This should be done after creating the OpenGL context
     GLenum glew_err = glewInit();
-
     if (glew_err != GLEW_OK) {
         fprintf(stderr, "GLEW initialization failed: %s\n", glewGetErrorString(glew_err));
         return -1;
     }
 
-    // Setup game context
+    // Setup global game context
     game_context ctx;
     ctx.win_handle = window;
     int res = load_resources(&ctx.resources);
-
     if (res < 0) {
         fprintf(stderr, "Resource loading failed\n");
         return -1;

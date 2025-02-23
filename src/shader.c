@@ -1,4 +1,5 @@
 #include "shader.h"
+#include "util.h"
 
 int load_shader(char* shaderSrc, int shader_type, shader_t* out_shader) {
     char* v_src = read_file_contents(shaderSrc);
@@ -81,20 +82,4 @@ int set_shader_param_mat4(u64 program, const char *name, mat4 value) {
         return 0;
     }
     return -1;
-}
-
-char* read_file_contents(const char* path) {
-    FILE* fp = fopen(path, "r");
-    if (!fp) {
-        fprintf(stderr, "Could not open file\n");
-        return NULL;
-    }
-    fseek(fp, 0, SEEK_END);
-    long size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    char* buffer = (char*)malloc(size + 1);
-    size_t read_size = fread(buffer, 1, size, fp);
-    fclose(fp);
-    buffer[read_size] = '\0';
-    return buffer;
 }
