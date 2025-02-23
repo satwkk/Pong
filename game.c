@@ -10,7 +10,11 @@ typedef struct {
 } game_context;
 
 int main() {
-    glfwInit();
+    int glfw_err = glfwInit();
+    if (glfw_err < 0) {
+        fprintf(stderr, "GLFW initialization failed: %s\n", glewGetErrorString(glfw_err));
+        return -1;
+    }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -24,13 +28,14 @@ int main() {
 
     glfwMakeContextCurrent(window);
 
-    GLenum err = glewInit();
+    GLenum glew_err = glewInit();
 
-    if (err != GLEW_OK) {
-        fprintf(stderr, "GLEW initialization failed: %s\n", glewGetErrorString(err));
+    if (glew_err != GLEW_OK) {
+        fprintf(stderr, "GLEW initialization failed: %s\n", glewGetErrorString(glew_err));
         return -1;
     }
 
+    // Setup game context
     game_context ctx;
     ctx.win_handle = window;
     int res = load_resources(&ctx.resources);
@@ -53,11 +58,15 @@ int main() {
     set_shader_param_mat4(ctx.resources.program_id, "projection", projection);
     set_shader_param_mat4(ctx.resources.program_id, "model", model);
 
+    // update loop
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.1, 0.1, 0.1, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        float red = sin(glfwGetTime());
+
         use_program(ctx.resources.program_id);
+        set_shader_param_vec4(ctx.resources.program_id, "u_Color", (vec4){ red, 1.0, 0.0, 1.0 });
         draw_sprite(&sprite);
 
         glfwPollEvents();

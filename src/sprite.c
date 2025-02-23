@@ -4,6 +4,7 @@ sprite_t create_sprite(const char* name, const char* path) {
     sprite_t sprite;
 
     float vertices[] = {
+        // vertices
         -0.5f, -0.5f, 0.0f,
         -0.5f, 0.5f, 0.0f,
          0.5f, -0.5f, 0.0f,
@@ -32,13 +33,16 @@ sprite_t create_sprite(const char* name, const char* path) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Bind vao pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)0);
     glEnableVertexAttribArray(0);
 
     // unbind the vao
     glBindVertexArray(0);
 
     return sprite;
+}
+
+void setup_transform(transform_t* transform) {
 }
 
 void draw_sprite(sprite_t* sprite) {
