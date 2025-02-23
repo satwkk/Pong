@@ -1,19 +1,20 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "resource.h"
 
-char* read_file_contents(const char* path) {
-    FILE* fp = fopen(path, "r");
-    if (!fp) {
-        fprintf(stderr, "Could not open file\n");
-        return NULL;
-    }
-    fseek(fp, 0, SEEK_END);
-    long size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    char* buffer = (char*)malloc(size + 1);
-    size_t read_size = fread(buffer, 1, size, fp);
-    fclose(fp);
-    buffer[read_size] = '\0';
-    return buffer;
+int load_resources(resource_container* resources) {
+    // Load vertex shader
+    int res = load_shader(VERTEX_SHADER_PATH, GL_VERTEX_SHADER, &resources->vertex_shader);
+    assert(res < 0);
+
+    // Load fragment shader
+    res = load_shader(FRAGMENT_SHADER_PATH, GL_FRAGMENT_SHADER, &resources->fragment_shader);
+    assert(res < 0);
+
+    // Create the program
+    resources->program_id = create_program(&resources->vertex_shader, &resources->fragment_shader);
+
+    return 0;
+}
+
+void cleanup_resources(resource_container* resources) {
+    glDeleteProgram(resources->program_id);
 }

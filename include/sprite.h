@@ -1,7 +1,6 @@
 #pragma once
 
-#include "cglm/cglm.h"
-#include "defines.h"
+#include "pch.h"
 
 typedef struct {
     // transform data
@@ -17,4 +16,4 @@ typedef struct {
 
 sprite_t create_sprite(const char* name, const char* path);
 
-void draw(sprite_t* sprite);
+void draw_sprite(sprite_t* sprite);

@@ -1,13 +1,13 @@
 #include <stdio.h>
-#include "cglm/cglm.h"
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
 #include "defines.h"
 #include "resource.h"
+#include "shader.h"
 #include "sprite.h"
 
-#define FLOAT16 \
-{1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f,1.0f};
+typedef struct {
+    GLFWwindow* win_handle;
+    resource_container resources;
+} game_context;
 
 int main() {
     glfwInit();
@@ -31,137 +31,43 @@ int main() {
         return -1;
     }
 
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.5f, 0.5f, 0.0f
-    };
+    game_context ctx;
+    ctx.win_handle = window;
+    int res = load_resources(&ctx.resources);
 
-    u64 indices[] = {
-        0, 1, 2,
-        1, 3, 2
-    };
+    if (res < 0) {
+        fprintf(stderr, "Resource loading failed\n");
+        return -1;
+    }
 
-    // Formula = projection * model * view
-    // Projection matrix
+    sprite_t sprite = create_sprite("red box", NULL);
+
     mat4 projection;
     glm_ortho(0, 800, 600, 0, -1, 1, projection);
 
     mat4 model;
     glm_mat4_identity(model);
+    glm_translate(model, (vec3){500, 400, 0.0});
+    glm_scale(model, (vec3){50.0, 50.0, 1.0});
 
-    // Model matrix
-    vec3 position;
-    glm_vec3_zero(position);
-    position[0] = 700.0;
-    position[1] = 500.0;
-    glm_translate(model, position);
-
-    glm_scale(model, (vec3){ 50.0f, 50.0f, 1.0f});
-
-    char* vertex_shader = read_file_contents("./resources/shaders/vertex.glsl");
-    char* fragment_shader = read_file_contents("./resources/shaders/fragment.glsl");
-
-    u64 vbo, ibo, vao;
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ibo);
-
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindVertexArray(0);
-
-    u64 v = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(v, 1, &vertex_shader, NULL);
-    glCompileShader(v);
-
-    {
-        int success = 0;
-        char buffer[1024];
-        glGetShaderiv(v, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(v, 1024, NULL, buffer);
-            fprintf(stderr, "Vertex shader compilation error\n%s\n", buffer);
-            exit(-1);
-        }
-    }
-
-    u64 f = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(f, 1, &fragment_shader, NULL);
-    glCompileShader(f);
-
-    {
-        int success = 0;
-        char buffer[1024];
-        glGetShaderiv(f, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(f, 1024, NULL, buffer);
-            fprintf(stderr, "Fragment shader compilation error\n%s\n", buffer);
-            exit(-1);
-        }
-    }
-
-
-    u64 program = glCreateProgram();
-    glAttachShader(program, v);
-    glAttachShader(program, f);
-    glLinkProgram(program);
-
-    {
-        int success = 0;
-        char buffer[1024];
-        glGetProgramiv(program, GL_LINK_STATUS, &success);
-        if (!success) {
-            glGetProgramInfoLog(program, 1024, NULL, buffer);
-            fprintf(stderr, "Program linkage error\n%s\n", buffer);
-            exit(-1);
-        }
-    }
-
-    glUseProgram(program);
-
-    i64 proj_uni_loc = glGetUniformLocation(program, "projection");
-    i64 model_uni_loc = glGetUniformLocation(program, "model");
-
-    if (proj_uni_loc < 0 || model_uni_loc < 0) {
-        fprintf(stderr, "Uniform locations could not be found\n");
-        return -1;
-    }
-
-    glUniformMatrix4fv(proj_uni_loc, 1, GL_FALSE, (const GLfloat*)projection);
-    glUniformMatrix4fv(model_uni_loc, 1, GL_FALSE, (const GLfloat*)model);
-
-    glDeleteShader(v);
-    glDeleteShader(f);
-    free(vertex_shader);
-    free(fragment_shader);
+    set_shader_param_mat4(ctx.resources.program_id, "projection", projection);
+    set_shader_param_mat4(ctx.resources.program_id, "model", model);
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.1, 0.1, 0.1, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(program);
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+        use_program(ctx.resources.program_id);
+        draw_sprite(&sprite);
 
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
 
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ibo);
-    glDeleteProgram(program);
+    cleanup_resources(&ctx.resources);
+    glDeleteVertexArrays(1, &sprite.vao);
+    glDeleteBuffers(1, &sprite.vbo);
+    glDeleteBuffers(1, &sprite.ibo);
     glfwDestroyWindow(window);
     glfwTerminate();
 

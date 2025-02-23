@@ -1,6 +1,4 @@
 #include "sprite.h"
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
 
 sprite_t create_sprite(const char* name, const char* path) {
     sprite_t sprite;
@@ -39,9 +37,11 @@ sprite_t create_sprite(const char* name, const char* path) {
 
     // unbind the vao
     glBindVertexArray(0);
+
+    return sprite;
 }
 
-void draw(sprite_t* sprite) {
+void draw_sprite(sprite_t* sprite) {
     glBindVertexArray(sprite->vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 }
