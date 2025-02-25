@@ -1,27 +1,69 @@
 #include "renderer.h"
-#include "shader.h"
+#include "util.h"
+#include "dynlist.h"
 
-renderer_t init_renderer(renderer_data_t config) {
-    // setup projection matrix
+renderer_t init_renderer(render_config_t config) {
     renderer_t ctx;
-    ctx.program_id = config.program_id;
+	memset(&ctx, 0, sizeof(renderer_t));
+    
+    // Load vertex shader
+    int res = load_shader(VERTEX_SHADER_PATH, GL_VERTEX_SHADER, &ctx.vertex_shader);
+    engine_assert(res >= 0);
+    
+    // Load fragment shader
+    res = load_shader(FRAGMENT_SHADER_PATH, GL_FRAGMENT_SHADER, &ctx.fragment_shader);
+    engine_assert(res >= 0);
 
+    // Create the program
+    ctx.program_id = create_program(&ctx.vertex_shader, &ctx.fragment_shader);
+
+    // setup projection matrix
     glm_ortho(0, config.w, config.h, 0, config.near_plane, config.far_plane, ctx.projection);
 
     // setup model matrix
     glm_mat4_identity(ctx.model);
+
+    // Cache the uniform location
+    ctx.projection_uniform_loc = get_shader_param(ctx.program_id, "projection");
+    ctx.model_uniform_loc = get_shader_param(ctx.program_id, "model");
+
     return ctx;
 }
 
-void renderer_update(renderer_t *ctx, sprite_t *sprite) {
-    // translate and set scale
-    glm_mat4_identity(ctx->model);
-    glm_translate(ctx->model, sprite->transform.position);
-    glm_scale(ctx->model, sprite->transform.scale);
-    
-    // set uniforms
-    set_shader_param_mat4(ctx->program_id, "projection", ctx->projection);
-    set_shader_param_mat4(ctx->program_id, "model", ctx->model);
+void push_sprite(renderer_t* ctx, sprite_t* sprite)
+{
+    if (ctx->sprite_entry_idx >= MAX_SPRITE_ENTRY) {
+		log_error("Max sprite entry reached. Cannot add more sprites\n");
+        return;
+    }
+	ctx->sprite_resource_arr[ctx->sprite_entry_idx++] = sprite;
+}
 
-    draw_sprite(sprite);
+void renderer_update(renderer_t *ctx) {
+    set_shader_param_mat4(ctx->projection_uniform_loc, ctx->projection);
+
+    for (size_t i = 0; i < MAX_SPRITE_ENTRY; i++) {
+		sprite_t* sprite = ctx->sprite_resource_arr[i];
+
+        if (sprite != NULL) {
+            log_info("Rendering sprite: %s | Address: %p | VAO: %d\n", sprite->name, sprite, sprite->vao);
+
+            // translate and set scale
+            glm_mat4_identity(ctx->model);
+            glm_translate(ctx->model, sprite->transform.position);
+            glm_scale(ctx->model, sprite->transform.scale);
+
+            
+            // set uniforms
+            set_shader_param_mat4(ctx->model_uniform_loc, ctx->model);
+            
+            // draw the sprite
+            draw_sprite(sprite);
+        }
+    }
+}
+
+void cleanup_renderer(renderer_t* renderer) {
+    // Delete the shader program
+    glDeleteProgram(renderer->program_id);
 }

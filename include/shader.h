@@ -10,7 +10,7 @@
 
 #define SHADER_COMPILE_CHECK(id, shader_name) \
 {\
-    int success = 0;\
+    i64 success = 0;\
     char buffer[1024];\
     glGetShaderiv(id, GL_COMPILE_STATUS, &success);\
     if (!success) {\
@@ -22,7 +22,7 @@
 
 #define PROGRAM_LINK_CHECK(id) \
 {\
-    int success = 0;\
+    i64 success = 0;\
     char buffer[1024];\
     glGetProgramiv(id, GL_LINK_STATUS, &success);\
     if (!success) {\
@@ -36,15 +36,16 @@ typedef struct {
     u64 shader_id;
 } shader_t;
 
-int load_shader(char* shaderSrc, int shader_type, shader_t* out_shader);
+i64 load_shader(char* shaderSrc, int shader_type, shader_t* out_shader);
 
 u64 create_program( shader_t* vertex, shader_t* fragment);
 
 void use_program(u64 program);
 
-int set_shader_param_float(u64 program, const char* name, float value);
-int set_shader_param_vec2(u64 program, const char* name, vec2 value);
-int set_shader_param_vec3(u64 program, const char* name, vec3 value);
-int set_shader_param_vec4(u64 program, const char* name, vec4 value);
-int set_shader_param_mat3(u64 program, const char* name, mat3 value);
-int set_shader_param_mat4(u64 program, const char* name, mat4 value);
+i64 get_shader_param(u64 program_id, const char* name);
+i64 set_shader_param_float(i64 uniform_loc, float value);
+i64 set_shader_param_vec2(i64 uniform_loc, vec2 value);
+i64 set_shader_param_vec3(i64 uniform_loc, vec3 value);
+i64 set_shader_param_vec4(i64 uniform_loc, vec4 value);
+i64 set_shader_param_mat3(i64 uniform_loc, mat3 value);
+i64 set_shader_param_mat4(i64 uniform_loc, mat4 value);

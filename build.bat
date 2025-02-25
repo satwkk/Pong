@@ -1,1 +1,1 @@
-cl /Iinclude /Iinclude/cglm/include game.c src/*.c /MD /D GLEW_STATIC /link /LIBPATH:libs glew32s.lib glfw3.lib opengl32.lib user32.lib gdi32.lib shell32.lib
+cmd /c cl.exe /Iinclude /Iinclude/cglm/include main.c src/*.c /MD /D GLEW_STATIC /link /LIBPATH:libs glew32s.lib glfw3.lib opengl32.lib user32.lib gdi32.lib shell32.lib /out:game.exe
