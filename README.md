@@ -4,6 +4,10 @@ The classic pong game created from scratch using OpenGL and C.
 This project includes a 2D renderer with texture loading capabilities. 
 The engine code is abstracted from the game code. game.c file contains all the scripting logic relative to pong game.
 
+# POC
+
+https://github.com/user-attachments/assets/d6a4e008-df3d-4d3c-87a3-0f3db7cadefe
+
 # Compile
 
 Below command will generate a visual studio project.
