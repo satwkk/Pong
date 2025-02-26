@@ -2,6 +2,7 @@
 #include "sprite.h"
 #include "util.h"
 #include "renderer.h"
+#include "colors.h"
 #include <stdbool.h>
 
 void game_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) 
@@ -18,22 +19,27 @@ int init_game(game_context* ctx)
     gameState.playerSpeed = PLAYERSPEED;
     
     // Create the sprites
-    gameState.leftPlayer = create_sprite("Left Player", NULL);
-    set_position(&gameState.leftPlayer, (vec3){ 10, (float)ctx->win_h / 2, 1});
+    gameState.leftPlayer = create_sprite("Left Player", TRANSPARENT, "./resources/images/paddle2.png");
+    set_position(&gameState.leftPlayer, (vec3){ 10, (float)ctx->win_h / 2, 1.0});
     set_scale(&gameState.leftPlayer, (vec3){ 10, 50, 1});
 
-    gameState.rightPlayer = create_sprite("Right Player", NULL);
-    set_position(&gameState.rightPlayer, (vec3){ ctx->win_w - 10, (float)ctx->win_h / 2, 1});
+    gameState.rightPlayer = create_sprite("Right Player", TRANSPARENT, "./resources/images/paddle2.png");
+    set_position(&gameState.rightPlayer, (vec3){ ctx->win_w - 10, (float)ctx->win_h / 2, 1.0});
     set_scale(&gameState.rightPlayer, (vec3){ 10, 50, 1});
+    
+    gameState.ball = create_sprite("Ball", TRANSPARENT, "./resources/images/ball.png");
+    set_position(&gameState.ball, (vec3){ 50, 50, 1.0});
+    set_scale(&gameState.ball, (vec3){20, 20, -1});
 
-    gameState.ball = create_sprite("Ball", "./resources/images/ball.png");
-    set_position(&gameState.ball, (vec3){ 50, 50, 0});
-    set_scale(&gameState.ball, (vec3){20, 20, 1});
-
+    gameState.background = create_sprite("Background", TRANSPARENT, "./resources/images/background.jpg");
+    set_position(&gameState.background, (vec3){ ctx->win_w / 2, ctx->win_h / 2, -1.0} );
+    set_scale(&gameState.background, (vec3){ ctx->win_w, ctx->win_h, 1 });
+    
     // TODO: Make these sprites automatically submit calls to renderer
     push_sprite(&ctx->renderer, &gameState.leftPlayer);
     push_sprite(&ctx->renderer, &gameState.rightPlayer);
     push_sprite(&ctx->renderer, &gameState.ball);
+    push_sprite(&ctx->renderer, &gameState.background);
 
     glm_vec3_make(vec3_left, gameState.ballDir);
 
@@ -56,19 +62,19 @@ void update_game(game_context* ctx)
 void update_player(game_context* ctx)
 {
     // left bat move up
-    if (glfwGetKey(ctx->win_handle, GLFW_KEY_W)) 
-    move(&gameState.leftPlayer, vec3_up, gameState.playerSpeed);
+    if (glfwGetKey(ctx->win_handle, GLFW_KEY_W) && gameState.leftPlayer.transform.position[1] - (gameState.leftPlayer.transform.scale[1] / 2) > 0) 
+        move(&gameState.leftPlayer, vec3_up, gameState.playerSpeed);
     
     // left bat move down
-    if (glfwGetKey(ctx->win_handle, GLFW_KEY_S)) 
-    move(&gameState.leftPlayer, vec3_down, gameState.playerSpeed);
+    if (glfwGetKey(ctx->win_handle, GLFW_KEY_S) && gameState.leftPlayer.transform.position[1] + (gameState.leftPlayer.transform.scale[1] / 2) < ctx->win_h) 
+        move(&gameState.leftPlayer, vec3_down, gameState.playerSpeed);
     
     // right bat move up
-    if (glfwGetKey(ctx->win_handle, GLFW_KEY_UP)) 
-    move(&gameState.rightPlayer, vec3_up, gameState.playerSpeed);
+    if (glfwGetKey(ctx->win_handle, GLFW_KEY_UP) && gameState.rightPlayer.transform.position[1] - (gameState.rightPlayer.transform.scale[1] / 2) > 0) 
+        move(&gameState.rightPlayer, vec3_up, gameState.playerSpeed);
     
     // right bat move down
-    if (glfwGetKey(ctx->win_handle, GLFW_KEY_DOWN)) 
+    if (glfwGetKey(ctx->win_handle, GLFW_KEY_DOWN) && gameState.rightPlayer.transform.position[1] + (gameState.rightPlayer.transform.scale[1] / 2) < ctx->win_h) 
         move(&gameState.rightPlayer, vec3_down, gameState.playerSpeed);
 }
 

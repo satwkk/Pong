@@ -49,8 +49,11 @@ void renderer_update(renderer_t *ctx) {
             glm_mat4_identity(ctx->model);
             glm_translate(ctx->model, sprite->transform.position);
             glm_scale(ctx->model, sprite->transform.scale);
-            // set uniforms
+            // set model matrix
             set_shader_param_mat4(ctx->model_uniform_loc, ctx->model);
+            // set color
+            i64 colorUniform = get_shader_param(ctx->program_id, "u_Color");
+            set_shader_param_vec4(colorUniform, sprite->color);
             // draw the sprite
             draw_sprite(sprite);
         }

@@ -4,12 +4,13 @@
 #include "gamecontext.h"
 
 #define BALLSPEED 3
-#define PLAYERSPEED 2
+#define PLAYERSPEED 3
 
 typedef struct {
     sprite_t leftPlayer;
     sprite_t rightPlayer    ;
     sprite_t ball;
+    sprite_t background;
     vec3 initialVelocity;
     vec3 ballVelocity;
     vec3 ballDir;

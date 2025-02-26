@@ -64,12 +64,15 @@ int main() {
     u64 color_uniform_loc = get_shader_param(ctx.renderer.program_id, "u_Color");
 
     glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthFunc(GL_LEQUAL);
+
+    glClearColor(0.1, 0.1, 0.1, 1.0);
 
     // update loop
     while (!glfwWindowShouldClose(window)) {
-        glClearColor(0.1, 0.1, 0.1, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         float red = sin(glfwGetTime() * 3.0);
 
         // ============================ GAME UPDATE =====================================
@@ -79,7 +82,6 @@ int main() {
         // ==============================================================================
 
         // ============================ RENDER UPDATE ===================================
-
         renderer_update(&ctx.renderer);
         set_shader_param_vec4(color_uniform_loc, (vec4){ red, 1.0, 0.0, 1.0 });
 

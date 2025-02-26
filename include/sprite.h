@@ -18,8 +18,8 @@ typedef struct {
     u64 vao;
 } sprite_t;
 
-sprite_t create_sprite(const char* name, const char* path);
-int bind_texture(const char* path, sprite_t* sprite);
 
+sprite_t create_sprite(const char* name, vec4 color, const char* path);
+int bind_texture(const char* path, sprite_t* sprite);
 void set_position(sprite_t* sprite, vec3 position);
 void set_scale(sprite_t* sprite, vec3 scale);

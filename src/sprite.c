@@ -4,7 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stbi_image.h"
 
-sprite_t create_sprite(const char* name, const char* path) {
+sprite_t create_sprite(const char* name, vec4 color, const char* path) {
     // todo: dynamically allocate the sprite
     sprite_t sprite;
 
@@ -12,13 +12,14 @@ sprite_t create_sprite(const char* name, const char* path) {
 
     glm_vec3_make((vec3){10, 10, 0}, sprite.transform.position);
     glm_vec3_make((vec3){50, 50, 1}, sprite.transform.scale);
+    glm_vec4_make(color, sprite.color);
 
     float vertices[] = {
-        // vertices              // colors                      // texture coords
-        -0.5f, -0.5f, 0.0f,      0.0f, 0.0f, 0.0f, 1.0f,        0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f,      0.0f, 0.0f, 0.0f, 1.0f,        0.0f, 1.0f,
-         0.5f, -0.5f, 0.0f,      0.0f, 0.0f, 0.0f, 1.0f,        1.0f, 0.0f,
-         0.5f,  0.5f, 0.0f,      0.0f, 0.0f, 0.0f, 1.0f,        1.0f, 1.0f
+        // vertices           // texture coords
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
+         0.5f,  0.5f, 0.0f,   1.0f, 1.0f
     };
 
     u64 indices[] = {
@@ -45,11 +46,9 @@ sprite_t create_sprite(const char* name, const char* path) {
 
     // Bind vao pointers
     glEnableVertexAttribArray(0); // vertex
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)0);
-    glEnableVertexAttribArray(1); // color
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)12);
-    glEnableVertexAttribArray(2); // tex coord
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)28);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
+    glEnableVertexAttribArray(1); // tex coord
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)12);
 
     // unbind the vao
     glBindVertexArray(0);
@@ -64,12 +63,21 @@ sprite_t create_sprite(const char* name, const char* path) {
 
 int bind_texture(const char* path, sprite_t* sprite) {
     unsigned char* data = NULL;
+    bool customAlloc = false;
     int width = 0, height = 0, channels = 0;
 
     if (path == NULL) {
-        // load a default texture
         log_info("NULL Path provided, getting the default texture for sprite %s\n", sprite->name);
-        data = stbi_load("./resources/images/container.jpg", &width, &height, &channels, 0);
+
+        customAlloc = true;
+        width = height = 1;
+        channels = 4;
+        data = (unsigned char*)malloc(width * height * channels);
+
+        data[0] = 255; //r 
+        data[1] = 255; //g
+        data[2] = 255; //b
+        data[3] = 255; //a
     } else {
         data = stbi_load(path, &width, &height, &channels, 0);
     }
@@ -84,23 +92,30 @@ int bind_texture(const char* path, sprite_t* sprite) {
 
     if (sprite->texture_id == 0) {
         log_error("Failed to generate OpenGL texture for sprite: %s\n", sprite->name);
-        stbi_image_free(data);
+        if (customAlloc) { 
+            free(data); 
+        } else { 
+            stbi_image_free(data); 
+        }
         return -1;
     }
 
-    glBindTexture(GL_TEXTURE_2D, sprite->texture_id);
-    
-    unsigned int format = (channels == 4) ? GL_RGBA : GL_RGB;
-
     log_info("Channels for sprite %s: %d\n", sprite->name, channels);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
+    glBindTexture(GL_TEXTURE_2D, sprite->texture_id);
+    unsigned int format = (channels == 4) ? GL_RGBA : GL_RGB;
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    stbi_image_free(data);
+    if (customAlloc) { 
+        free(data); 
+    } else { 
+        stbi_image_free(data); 
+    }
+
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return 0;
