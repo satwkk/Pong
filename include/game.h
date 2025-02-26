@@ -8,14 +8,23 @@
 
 typedef struct {
     sprite_t leftPlayer;
-    sprite_t rightPlayer    ;
+    sprite_t rightPlayer;
     sprite_t ball;
     sprite_t background;
+
     vec3 initialVelocity;
     vec3 ballVelocity;
     vec3 ballDir;
+
     float ballSpeed;
     float playerSpeed;
+
+    float speedIncreaseInterval;
+    float lastTickTimer;
+
+    bool bStartCameraShake;
+    float cameraShakeDuration;
+    float lastShakeDuration;
 } game_state_t;
 
 static game_state_t gameState;
@@ -27,6 +36,7 @@ int init_game(game_context* ctx);
 void update_player(game_context* ctx);
 void update_ball(game_context* ctx);
 void update_game(game_context* ctx);
+void update_ball_speed();
 
 // CALLBACKS
 void game_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
