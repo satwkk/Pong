@@ -66,7 +66,7 @@ int main() {
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthFunc(GL_LEQUAL);
+    glDepthFunc(GL_LESS);
 
     glClearColor(0.1, 0.1, 0.1, 1.0);
 

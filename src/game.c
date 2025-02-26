@@ -20,26 +20,31 @@ int init_game(game_context* ctx) {
     
     // Create the sprites
     gameState.leftPlayer = create_sprite("Left Player", TRANSPARENT, "./resources/images/paddle2.png");
-    set_position(&gameState.leftPlayer, (vec3){ 10, (float)ctx->win_h / 2, 1.0});
+    set_position(&gameState.leftPlayer, (vec3){ 10, (float)ctx->win_h / 2, 1});
     set_scale(&gameState.leftPlayer, (vec3){ 10, 70, 1});
 
     gameState.rightPlayer = create_sprite("Right Player", TRANSPARENT, "./resources/images/paddle2.png");
-    set_position(&gameState.rightPlayer, (vec3){ ctx->win_w - 10, (float)ctx->win_h / 2, 1.0});
+    set_position(&gameState.rightPlayer, (vec3){ ctx->win_w - 10, (float)ctx->win_h / 2, 1});
     set_scale(&gameState.rightPlayer, (vec3){ 10, 70, 1});
     
     gameState.ball = create_sprite("Ball", TRANSPARENT, "./resources/images/ball.png");
-    set_position(&gameState.ball, (vec3){ 50, 50, 1.0});
+    set_position(&gameState.ball, (vec3){ 50, 50, 1});
     set_scale(&gameState.ball, (vec3){20, 20, -1});
 
     gameState.background = create_sprite("Background", TRANSPARENT, "./resources/images/background.jpg");
-    set_position(&gameState.background, (vec3){ ctx->win_w / 2, ctx->win_h / 2, -1.0} );
+    set_position(&gameState.background, (vec3){ ctx->win_w / 2, ctx->win_h / 2, -0.9} );
     set_scale(&gameState.background, (vec3){ ctx->win_w, ctx->win_h, 1 });
+
+    gameState.background_2 = create_sprite("Background", TRANSPARENT, "./resources/images/background.jpg");
+    set_position(&gameState.background_2, (vec3){ ctx->win_w / 2, ctx->win_h / 2, 0.2} );
+    set_scale(&gameState.background_2, (vec3){ 400, 400, 1 });
     
     // TODO: Make these sprites automatically submit calls to renderer
+    push_sprite(&ctx->renderer, &gameState.background);
+    push_sprite(&ctx->renderer, &gameState.background_2);
     push_sprite(&ctx->renderer, &gameState.leftPlayer);
     push_sprite(&ctx->renderer, &gameState.rightPlayer);
     push_sprite(&ctx->renderer, &gameState.ball);
-    push_sprite(&ctx->renderer, &gameState.background);
 
     glm_vec3_make(vec3_left, gameState.ballDir);
 
@@ -91,8 +96,8 @@ void update_ball_speed() {
     if ((time - gameState.lastTickTimer) >= gameState.speedIncreaseInterval) {
         gameState.ballSpeed += (gameState.ballSpeed * 0.1);  // 10 percent increase
         gameState.lastTickTimer = time;
+        log_info("New ball speed: %f\n", gameState.ballSpeed);
     }
-    log_info("Remaining time: %f\n", time - gameState.lastTickTimer);
 }
 
 void update_ball(game_context* ctx)  {
@@ -122,8 +127,6 @@ void update_ball(game_context* ctx)  {
         }
     }
 
-    // move the ball in the direction with ball speed
-    // todo: increase the ball speed as the game play goes
     move(&gameState.ball, gameState.ballDir, gameState.ballSpeed);
 }
 
