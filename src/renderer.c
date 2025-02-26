@@ -42,21 +42,15 @@ void push_sprite(renderer_t* ctx, sprite_t* sprite)
 void renderer_update(renderer_t *ctx) {
     set_shader_param_mat4(ctx->projection_uniform_loc, ctx->projection);
 
-    for (size_t i = 0; i < MAX_SPRITE_ENTRY; i++) {
+    for (size_t i = 0; i < ctx->sprite_entry_idx; i++) {
 		sprite_t* sprite = ctx->sprite_resource_arr[i];
-
         if (sprite != NULL) {
-            log_info("Rendering sprite: %s | Address: %p | VAO: %d\n", sprite->name, sprite, sprite->vao);
-
             // translate and set scale
             glm_mat4_identity(ctx->model);
             glm_translate(ctx->model, sprite->transform.position);
             glm_scale(ctx->model, sprite->transform.scale);
-
-            
             // set uniforms
             set_shader_param_mat4(ctx->model_uniform_loc, ctx->model);
-            
             // draw the sprite
             draw_sprite(sprite);
         }
@@ -66,4 +60,12 @@ void renderer_update(renderer_t *ctx) {
 void cleanup_renderer(renderer_t* renderer) {
     // Delete the shader program
     glDeleteProgram(renderer->program_id);
+}
+
+void draw_sprite(sprite_t* sprite) {
+    glBindVertexArray(sprite->vao);
+    glBindTexture(GL_TEXTURE_2D, sprite->texture_id);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }

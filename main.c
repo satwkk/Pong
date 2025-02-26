@@ -5,6 +5,9 @@
 #include "util.h"
 #include "game.h"
 
+#define WIDTH 800
+#define HEIGHT 600
+
 int main() {
     // Initialize GLFW
     int glfw_err = glfwInit();
@@ -16,7 +19,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create window
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Hello world", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Hello world", NULL, NULL);
     engine_assert(window != NULL);
 
     // Create the window context
@@ -30,6 +33,8 @@ int main() {
     // Setup global game context
     game_context ctx;
     ctx.win_handle = window;
+    ctx.win_w = WIDTH;
+    ctx.win_h = HEIGHT;
 
     // Load all the resources for the game. 
     // NOTE: THIS SHOULD HAPPEN BEFORE RENDERER IS INITIALIZED
@@ -53,9 +58,13 @@ int main() {
 
     // Initialize the game
     int init_game_res = init_game(&ctx);
+
     engine_assert(init_game_res >= 0);
 
     u64 color_uniform_loc = get_shader_param(ctx.renderer.program_id, "u_Color");
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // update loop
     while (!glfwWindowShouldClose(window)) {

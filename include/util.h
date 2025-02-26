@@ -14,10 +14,10 @@ if (!(x)) {\
     exit(-1);\
 }\
 
-#define vec3_right (vec3) { 1, 0, 0 }
-#define vec3_left (vec3) { -1, 0, 0 }
-#define vec3_up (vec3) { 0, 1, 0}
-#define vec3_down (vec3) { 0, -1, 0}
+#define vec3_right (vec3) { -1, 0, 0 }
+#define vec3_left (vec3) { 1, 0, 0 }
+#define vec3_up (vec3) { 0, -1, 0}
+#define vec3_down (vec3) { 0, 1, 0}
 
 inline void engine_log(FILE* stream, const char* log, ...) {
     va_list list;

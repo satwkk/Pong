@@ -5,6 +5,7 @@
 #include "stbi_image.h"
 
 sprite_t create_sprite(const char* name, const char* path) {
+    // todo: dynamically allocate the sprite
     sprite_t sprite;
 
     sprite.name = name;
@@ -90,6 +91,8 @@ int bind_texture(const char* path, sprite_t* sprite) {
     glBindTexture(GL_TEXTURE_2D, sprite->texture_id);
     
     unsigned int format = (channels == 4) ? GL_RGBA : GL_RGB;
+
+    log_info("Channels for sprite %s: %d\n", sprite->name, channels);
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -109,12 +112,4 @@ void set_position(sprite_t* sprite, vec3 position) {
 
 void set_scale(sprite_t* sprite, vec3 scale) {
     glm_vec3_make((const float*)scale, sprite->transform.scale);
-}
-
-void draw_sprite(sprite_t* sprite) {
-    glBindVertexArray(sprite->vao);
-    glBindTexture(GL_TEXTURE_2D, sprite->texture_id);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
 }

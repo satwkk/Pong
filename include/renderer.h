@@ -32,3 +32,4 @@ renderer_t init_renderer(render_config_t config);
 void push_sprite(renderer_t* ctx, sprite_t* sprite);
 void cleanup_renderer(renderer_t* renderer);
 void renderer_update(renderer_t* ctx);
+void draw_sprite(sprite_t* sprite);

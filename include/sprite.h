@@ -23,6 +23,3 @@ int bind_texture(const char* path, sprite_t* sprite);
 
 void set_position(sprite_t* sprite, vec3 position);
 void set_scale(sprite_t* sprite, vec3 scale);
-
-// TODO: This will be moved into renderer
-void draw_sprite(sprite_t* sprite);
