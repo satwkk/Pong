@@ -33,4 +33,5 @@
 #define CHOCOLATE   (vec4){0.824, 0.412, 0.118, 1.0}
 #define PLUM        (vec4){0.867, 0.627, 0.867, 1.0}
 #define TRANSPARENT (vec4){1.0, 1.0, 1.0, 1.0}
+#define SCIFI_BLUE (vec4){0.165, 0.68, 0.819, 1.0}
 

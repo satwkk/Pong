@@ -5,7 +5,7 @@
 typedef struct {
     vec3 position;
     vec3 scale;
-    mat4 rotation;
+    float angle;
 } transform_t;
 
 typedef struct {
@@ -22,4 +22,5 @@ typedef struct {
 sprite_t* create_sprite(const char* name, vec4 color, const char* path);
 int bind_texture(const char* path, sprite_t* sprite);
 void set_position(sprite_t* sprite, vec3 position);
+void set_rotation(sprite_t *sprite, float angle);
 void set_scale(sprite_t* sprite, vec3 scale);

@@ -25,7 +25,7 @@ typedef struct {
 
     bool bStartCameraShake;
     float cameraShakeDuration;
-    float lastShakeDuration;
+    float cameraShakeTimer;
 } game_state_t;
 
 static game_state_t gameState;
@@ -36,7 +36,7 @@ int init_game(game_context* ctx);
 // UPDATE LOOPS
 void update_player(game_context* ctx);
 void update_ball(game_context* ctx);
-void update_game(game_context* ctx);
+void update_game(game_context* ctx, const float dt);
 void update_ball_speed();
 
 // CALLBACKS

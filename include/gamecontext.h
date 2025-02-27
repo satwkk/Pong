@@ -10,4 +10,7 @@ typedef struct {
     u64 win_w;
     resource_container resources;
     renderer_t renderer;
+
+    float lastFrameTime;
+    float deltaSeconds;
 } game_context;

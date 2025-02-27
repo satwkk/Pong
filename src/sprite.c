@@ -114,6 +114,10 @@ void set_position(sprite_t* sprite, vec3 position) {
     glm_vec3_make((const float*)position, sprite->transform.position);
 }
 
+void set_rotation(sprite_t *sprite, float angle) {
+    sprite->transform.angle = angle;
+}
+
 void set_scale(sprite_t* sprite, vec3 scale) {
     glm_vec3_make((const float*)scale, sprite->transform.scale);
 }

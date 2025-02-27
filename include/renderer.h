@@ -6,7 +6,7 @@
 
 #define VERTEX_SHADER_PATH "./resources/shaders/vertex.glsl"
 #define FRAGMENT_SHADER_PATH "./resources/shaders/fragment.glsl"
-#define MAX_SPRITE_ENTRY 50
+#define MAX_SPRITE_ENTRY 500
 
 typedef struct {
     float w;

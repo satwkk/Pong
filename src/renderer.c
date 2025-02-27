@@ -76,9 +76,10 @@ void renderer_update(renderer_t *ctx) {
     for (size_t i = 0; i < ctx->sprite_entry_idx; i++) {
 		sprite_t* sprite = ctx->sprite_resource_arr[i];
         if (sprite != NULL && sprite->vao > 0) {
-            // translate and set scale
+            // translate rotate and set scale
             glm_mat4_identity(ctx->model);
             glm_translate(ctx->model, sprite->transform.position);
+            glm_rotate(ctx->model, glm_rad(sprite->transform.angle), (vec3) { 0, 0, 1});
             glm_scale(ctx->model, sprite->transform.scale);
             // set model matrix
             set_shader_param_mat4(ctx->model_uniform_loc, ctx->model);
@@ -96,6 +97,7 @@ void cleanup_renderer(renderer_t* renderer) {
         sprite_t* sprite_ref = renderer->sprite_resource_arr[i];
         if (sprite_ref != NULL) {
             free(sprite_ref);
+            sprite_ref = NULL;
         }
     }
 

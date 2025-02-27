@@ -5,8 +5,8 @@
 #include "util.h"
 #include "game.h"
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 1024
+#define HEIGHT 768
 
 int main() {
     // Initialize GLFW
@@ -43,8 +43,8 @@ int main() {
 
     // Initialize the renderer with required data
     ctx.renderer = init_renderer((render_config_t) {
-        .w = 800,
-        .h = 600,
+        .w = WIDTH,
+        .h = HEIGHT,
         .near_plane = -1,
         .far_plane = 1
     });
@@ -75,8 +75,12 @@ int main() {
         float red = sin(glfwGetTime() * 3.0);
 
         // ============================ GAME UPDATE =====================================
-        
-        update_game(&ctx);
+
+        double currentFrameTime = glfwGetTime();
+        ctx.deltaSeconds = currentFrameTime - ctx.lastFrameTime;
+        ctx.lastFrameTime = currentFrameTime;
+
+        update_game(&ctx, ctx.deltaSeconds);
 
         // ==============================================================================
 
