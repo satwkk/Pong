@@ -7,11 +7,11 @@
 #define PLAYERSPEED 3
 
 typedef struct {
-    sprite_t leftPlayer;
-    sprite_t rightPlayer;
-    sprite_t ball;
-    sprite_t background;
-    sprite_t background_2;
+    sprite_t* leftPlayer;
+    sprite_t* rightPlayer;
+    sprite_t* ball;
+    sprite_t* background;
+    sprite_t* background_2;
 
     vec3 initialVelocity;
     vec3 ballVelocity;

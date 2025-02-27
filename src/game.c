@@ -20,31 +20,31 @@ int init_game(game_context* ctx) {
     
     // Create the sprites
     gameState.leftPlayer = create_sprite("Left Player", TRANSPARENT, "./resources/images/paddle2.png");
-    set_position(&gameState.leftPlayer, (vec3){ 10, (float)ctx->win_h / 2, 1});
-    set_scale(&gameState.leftPlayer, (vec3){ 10, 70, 1});
+    set_position(gameState.leftPlayer, (vec3){ 10, (float)ctx->win_h / 2, 1});
+    set_scale(gameState.leftPlayer, (vec3){ 10, 70, 1});
 
     gameState.rightPlayer = create_sprite("Right Player", TRANSPARENT, "./resources/images/paddle2.png");
-    set_position(&gameState.rightPlayer, (vec3){ ctx->win_w - 10, (float)ctx->win_h / 2, 1});
-    set_scale(&gameState.rightPlayer, (vec3){ 10, 70, 1});
+    set_position(gameState.rightPlayer, (vec3){ ctx->win_w - 10, (float)ctx->win_h / 2, 1});
+    set_scale(gameState.rightPlayer, (vec3){ 10, 70, 1});
     
     gameState.ball = create_sprite("Ball", TRANSPARENT, "./resources/images/ball.png");
-    set_position(&gameState.ball, (vec3){ 50, 50, 1});
-    set_scale(&gameState.ball, (vec3){20, 20, -1});
+    set_position(gameState.ball, (vec3){ 50, 50, 1});
+    set_scale(gameState.ball, (vec3){20, 20, -1});
 
     gameState.background = create_sprite("Background", TRANSPARENT, "./resources/images/background.jpg");
-    set_position(&gameState.background, (vec3){ ctx->win_w / 2, ctx->win_h / 2, -0.9} );
-    set_scale(&gameState.background, (vec3){ ctx->win_w, ctx->win_h, 1 });
+    set_position(gameState.background, (vec3){ ctx->win_w / 2, ctx->win_h / 2, -0.9} );
+    set_scale(gameState.background, (vec3){ ctx->win_w, ctx->win_h, 1 });
 
-    gameState.background_2 = create_sprite("Background", TRANSPARENT, "./resources/images/background.jpg");
-    set_position(&gameState.background_2, (vec3){ ctx->win_w / 2, ctx->win_h / 2, 0.2} );
-    set_scale(&gameState.background_2, (vec3){ 400, 400, 1 });
+    gameState.background_2 = create_sprite("Background 2", TRANSPARENT, "./resources/images/background.jpg");
+    set_position(gameState.background_2, (vec3){ ctx->win_w / 2, ctx->win_h / 2, 0.2} );
+    set_scale(gameState.background_2, (vec3){ 400, 400, 1 });
     
     // TODO: Make these sprites automatically submit calls to renderer
-    push_sprite(&ctx->renderer, &gameState.background);
-    push_sprite(&ctx->renderer, &gameState.background_2);
-    push_sprite(&ctx->renderer, &gameState.leftPlayer);
-    push_sprite(&ctx->renderer, &gameState.rightPlayer);
-    push_sprite(&ctx->renderer, &gameState.ball);
+    push_sprite(&ctx->renderer, gameState.background);
+    push_sprite(&ctx->renderer, gameState.background_2);
+    push_sprite(&ctx->renderer, gameState.leftPlayer);
+    push_sprite(&ctx->renderer, gameState.rightPlayer);
+    push_sprite(&ctx->renderer, gameState.ball);
 
     glm_vec3_make(vec3_left, gameState.ballDir);
 
@@ -75,20 +75,20 @@ void update_game(game_context* ctx) {
 
 void update_player(game_context* ctx) {
     // left bat move up
-    if (glfwGetKey(ctx->win_handle, GLFW_KEY_W) && gameState.leftPlayer.transform.position[1] - (gameState.leftPlayer.transform.scale[1] / 2) > 0) 
-        move(&gameState.leftPlayer, vec3_up, gameState.playerSpeed);
+    if (glfwGetKey(ctx->win_handle, GLFW_KEY_W) && gameState.leftPlayer->transform.position[1] - (gameState.leftPlayer->transform.scale[1] / 2) > 0) 
+        move(gameState.leftPlayer, vec3_up, gameState.playerSpeed);
     
     // left bat move down
-    if (glfwGetKey(ctx->win_handle, GLFW_KEY_S) && gameState.leftPlayer.transform.position[1] + (gameState.leftPlayer.transform.scale[1] / 2) < ctx->win_h) 
-        move(&gameState.leftPlayer, vec3_down, gameState.playerSpeed);
+    if (glfwGetKey(ctx->win_handle, GLFW_KEY_S) && gameState.leftPlayer->transform.position[1] + (gameState.leftPlayer->transform.scale[1] / 2) < ctx->win_h) 
+        move(gameState.leftPlayer, vec3_down, gameState.playerSpeed);
     
     // right bat move up
-    if (glfwGetKey(ctx->win_handle, GLFW_KEY_UP) && gameState.rightPlayer.transform.position[1] - (gameState.rightPlayer.transform.scale[1] / 2) > 0) 
-        move(&gameState.rightPlayer, vec3_up, gameState.playerSpeed);
+    if (glfwGetKey(ctx->win_handle, GLFW_KEY_UP) && gameState.rightPlayer->transform.position[1] - (gameState.rightPlayer->transform.scale[1] / 2) > 0) 
+        move(gameState.rightPlayer, vec3_up, gameState.playerSpeed);
     
     // right bat move down
-    if (glfwGetKey(ctx->win_handle, GLFW_KEY_DOWN) && gameState.rightPlayer.transform.position[1] + (gameState.rightPlayer.transform.scale[1] / 2) < ctx->win_h) 
-        move(&gameState.rightPlayer, vec3_down, gameState.playerSpeed);
+    if (glfwGetKey(ctx->win_handle, GLFW_KEY_DOWN) && gameState.rightPlayer->transform.position[1] + (gameState.rightPlayer->transform.scale[1] / 2) < ctx->win_h) 
+        move(gameState.rightPlayer, vec3_down, gameState.playerSpeed);
 }
 
 void update_ball_speed() {
@@ -104,30 +104,30 @@ void update_ball(game_context* ctx)  {
     // bat hit detection
     {
         // left
-        if (is_ball_in_range_to_hit(&gameState.leftPlayer) && gameState.ball.transform.position[0] < gameState.leftPlayer.transform.position[0] + gameState.leftPlayer.transform.scale[0])  {
-            on_player_hit(&gameState.ball, gameState.leftPlayer.transform.position, gameState.ballDir);
+        if (is_ball_in_range_to_hit(gameState.leftPlayer) && gameState.ball->transform.position[0] < gameState.leftPlayer->transform.position[0] + gameState.leftPlayer->transform.scale[0])  {
+            on_player_hit(gameState.ball, gameState.leftPlayer->transform.position, gameState.ballDir);
         }
         
         // right
-        if (is_ball_in_range_to_hit(&gameState.rightPlayer) && gameState.ball.transform.position[0] + gameState.ball.transform.scale[0] > gameState.rightPlayer.transform.position[0]) {
-            on_player_hit(&gameState.ball, gameState.rightPlayer.transform.position, gameState.ballDir);
+        if (is_ball_in_range_to_hit(gameState.rightPlayer) && gameState.ball->transform.position[0] + gameState.ball->transform.scale[0] > gameState.rightPlayer->transform.position[0]) {
+            on_player_hit(gameState.ball, gameState.rightPlayer->transform.position, gameState.ballDir);
         }
     }
     
     // window edge hit detection
     {
         // up
-        if (gameState.ball.transform.position[1] < 0) {
+        if (gameState.ball->transform.position[1] < 0) {
             on_border_hit((vec3){ 0, 1, 0}, gameState.ballDir);
         }
         
         // down
-        if (gameState.ball.transform.position[1] > ctx->win_h) {
+        if (gameState.ball->transform.position[1] > ctx->win_h) {
             on_border_hit((vec3){ 0, -1, 0}, gameState.ballDir);
         }
     }
 
-    move(&gameState.ball, gameState.ballDir, gameState.ballSpeed);
+    move(gameState.ball, gameState.ballDir, gameState.ballSpeed);
 }
 
 void move(sprite_t* player, vec3 dir, float speed) {
@@ -137,8 +137,8 @@ void move(sprite_t* player, vec3 dir, float speed) {
 }
 
 bool is_ball_in_range_to_hit(sprite_t* player) {
-    return gameState.ball.transform.position[1] > (player->transform.position[1] - (player->transform.scale[1] / 2)) &&
-    gameState.ball.transform.position[1] < (player->transform.position[1] + (player->transform.scale[1] / 2));
+    return gameState.ball->transform.position[1] > (player->transform.position[1] - (player->transform.scale[1] / 2)) &&
+    gameState.ball->transform.position[1] < (player->transform.position[1] + (player->transform.scale[1] / 2));
 }
 
 void on_player_hit(sprite_t* ball, vec3 hitPoint, vec3 direction) {

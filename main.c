@@ -58,7 +58,6 @@ int main() {
 
     // Initialize the game
     int init_game_res = init_game(&ctx);
-
     engine_assert(init_game_res >= 0);
 
     u64 color_uniform_loc = get_shader_param(ctx.renderer.program_id, "u_Color");

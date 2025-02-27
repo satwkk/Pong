@@ -4,15 +4,15 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stbi_image.h"
 
-sprite_t create_sprite(const char* name, vec4 color, const char* path) {
+sprite_t* create_sprite(const char* name, vec4 color, const char* path) {
     // todo: dynamically allocate the sprite
-    sprite_t sprite;
+    sprite_t* sprite = (sprite_t*)malloc(sizeof(sprite_t));
 
-    sprite.name = name;
+    sprite->name = name;
 
-    glm_vec3_make((vec3){10, 10, 0}, sprite.transform.position);
-    glm_vec3_make((vec3){50, 50, 1}, sprite.transform.scale);
-    glm_vec4_make(color, sprite.color);
+    glm_vec3_make((vec3){10, 10, 0}, sprite->transform.position);
+    glm_vec3_make((vec3){50, 50, 1}, sprite->transform.scale);
+    glm_vec4_make(color, sprite->color);
 
     float vertices[] = {
         // vertices           // texture coords
@@ -28,19 +28,19 @@ sprite_t create_sprite(const char* name, vec4 color, const char* path) {
     };
     
     // Generate buffers
-    glGenBuffers(1, &sprite.vbo);
-    glGenBuffers(1, &sprite.ibo);
-    glGenVertexArrays(1, &sprite.vao);
+    glGenBuffers(1, &sprite->vbo);
+    glGenBuffers(1, &sprite->ibo);
+    glGenVertexArrays(1, &sprite->vao);
 
     // Bind vao
-    glBindVertexArray(sprite.vao);
+    glBindVertexArray(sprite->vao);
 
     // Setup buffer data
-    glBindBuffer(GL_ARRAY_BUFFER, sprite.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, sprite->vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Setup index buffer data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite.ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
@@ -54,22 +54,20 @@ sprite_t create_sprite(const char* name, vec4 color, const char* path) {
     glBindVertexArray(0);
 
     // Bind texture
-    engine_assert(bind_texture(path, &sprite) >= 0);
+    engine_assert(bind_texture(path, sprite) >= 0);
 
-    log_info("Created sprite: %s | Address: %p | VAO: %d\n", sprite.name, (void*)&sprite, sprite.vao);
+    log_info("Created sprite: %s | Address: %p | VAO: %d\n", sprite->name, (void*)&sprite, sprite->vao);
 
     return sprite;
 }
 
 int bind_texture(const char* path, sprite_t* sprite) {
     unsigned char* data = NULL;
-    bool customAlloc = false;
     int width = 0, height = 0, channels = 0;
 
     if (path == NULL) {
         log_info("NULL Path provided, getting the default texture for sprite %s\n", sprite->name);
 
-        customAlloc = true;
         width = height = 1;
         channels = 4;
         data = (unsigned char*)malloc(width * height * channels);
@@ -92,11 +90,7 @@ int bind_texture(const char* path, sprite_t* sprite) {
 
     if (sprite->texture_id == 0) {
         log_error("Failed to generate OpenGL texture for sprite: %s\n", sprite->name);
-        if (customAlloc) { 
-            free(data); 
-        } else { 
-            stbi_image_free(data); 
-        }
+        stbi_image_free(data); 
         return -1;
     }
 
@@ -110,12 +104,7 @@ int bind_texture(const char* path, sprite_t* sprite) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    if (customAlloc) { 
-        free(data); 
-    } else { 
-        stbi_image_free(data); 
-    }
-
+    stbi_image_free(data); 
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return 0;

@@ -39,12 +39,43 @@ void push_sprite(renderer_t* ctx, sprite_t* sprite)
 	ctx->sprite_resource_arr[ctx->sprite_entry_idx++] = sprite;
 }
 
+void destroy_sprite(renderer_t *renderer, sprite_t *sprite) {
+    for (size_t i = 0; i < renderer->sprite_entry_idx; i++) {
+        sprite_t* s = renderer->sprite_resource_arr[i];
+
+        if (strcmp(s->name, sprite->name) == 0) {
+            log_info("Destroying sprite: %s\n", s->name);
+
+            // if not last element
+            if (i < renderer->sprite_entry_idx - 1) {
+
+                // Swap with last sprite
+                sprite_t* last_sprite = renderer->sprite_resource_arr[renderer->sprite_entry_idx - 1];
+                log_info("Swapping with last sprite: %s\n", last_sprite->name);
+                renderer->sprite_resource_arr[renderer->sprite_entry_idx - 1] = s;
+                renderer->sprite_resource_arr[i] = last_sprite;
+    
+                // Free the last sprite
+                sprite_t* updated_last_sprite = renderer->sprite_resource_arr[renderer->sprite_entry_idx - 1];
+                log_info("Last sprite updated to: %s\n", updated_last_sprite->name);
+                free(updated_last_sprite);
+                updated_last_sprite = NULL;
+            } else {
+                free(s);
+                s = NULL;
+            }
+            renderer->sprite_entry_idx--;
+            break;
+        }
+    }
+}
+
 void renderer_update(renderer_t *ctx) {
     set_shader_param_mat4(ctx->projection_uniform_loc, ctx->projection);
 
     for (size_t i = 0; i < ctx->sprite_entry_idx; i++) {
 		sprite_t* sprite = ctx->sprite_resource_arr[i];
-        if (sprite != NULL) {
+        if (sprite != NULL && sprite->vao > 0) {
             // translate and set scale
             glm_mat4_identity(ctx->model);
             glm_translate(ctx->model, sprite->transform.position);
@@ -61,6 +92,13 @@ void renderer_update(renderer_t *ctx) {
 }
 
 void cleanup_renderer(renderer_t* renderer) {
+    for (size_t i = 0; i < renderer->sprite_entry_idx; i++) {
+        sprite_t* sprite_ref = renderer->sprite_resource_arr[i];
+        if (sprite_ref != NULL) {
+            free(sprite_ref);
+        }
+    }
+
     // Delete the shader program
     glDeleteProgram(renderer->program_id);
 }
