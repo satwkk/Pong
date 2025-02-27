@@ -1,4 +1,4 @@
-# Pong
+# Sci-Fi Pong
 
 The classic pong game created from scratch using OpenGL and C. 
 This project includes a 2D renderer with texture loading capabilities. 
@@ -6,7 +6,7 @@ The engine code is abstracted from the game code. game.c file contains all the s
 
 # POC
 
-https://github.com/user-attachments/assets/d6a4e008-df3d-4d3c-87a3-0f3db7cadefe
+https://github.com/user-attachments/assets/89767106-30e0-4412-b33d-4bb051055f2a
 
 # Compile
 
@@ -18,9 +18,9 @@ cmake . -G "Visual Studio 17 2022"
 ```
 
 If you want to compile it without visual studio - 
-1. Add cl.exe to your environment path.
-2. Open cmd.exe and go inside game directory.
-3. Run the build.bat script, it will generate a game.exe file.
+1. Run vcvars64.bat batch file to load into visual studio developer console
+2. Go to game directory and run the build.bat script.
+3. Run game.exe !!
 
 # Dependencies
 
